@@ -13,15 +13,12 @@ variables:
   DB_PASSWORD: "your_mysql_password"
 
 before_script:
-  - echo "Checking PHP version..."
   - php -v
-  - echo "Checking Composer..."
   - composer --version || curl -sS https://getcomposer.org/installer | php && sudo mv composer.phar /usr/local/bin/composer
-  - echo "Setting permissions..."
   - chmod -R 775 storage bootstrap/cache
   - chown -R $USER:www-data storage bootstrap/cache
-  - cp .env.example .env || echo ".env already exists"
-  - php artisan key:generate || echo "Key already generated"
+  - cp .env.example .env || true
+  - php artisan key:generate || true
 
 install_dependencies:
   stage: install
@@ -36,14 +33,13 @@ run_tests:
   stage: test
   script:
     - echo "Running Laravel tests..."
-    - php artisan test || echo "Tests completed with warnings"
+    - php artisan test || true
 
 deploy:
   stage: deploy
   script:
-    - echo "Deploy step: Running migrations and clearing cache..."
+    - echo "Running migrations..."
     - php artisan migrate --force
+    - echo "Clearing caches..."
     - php artisan config:cache
-    - php artisan route:cache
-    - php artisan view:cache
-    - echo "Deployment completed!"
+    - php artisan
