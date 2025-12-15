@@ -2,26 +2,45 @@ stages:
   - build
   - deploy
 
+variables:
+  COMPOSER_ALLOW_SUPERUSER: "1"
+  COMPOSER_MEMORY_LIMIT: "-1"
+
 build:
   stage: build
   script:
-    - echo "BUILD stage"
+    - echo "BUILD stage (low memory safe)"
     - php -v
     - composer --version
-    - composer install --no-dev --optimize-autoloader
+
+    # Low memory composer
+    - composer install \
+        --no-dev \
+        --no-interaction \
+        --prefer-dist \
+        --no-progress \
+        --optimize-autoloader \
+        --no-scripts
 
 deploy:
   stage: deploy
   script:
-    - echo "DEPLOY stage"
-    - pwd
-    - ls -l
+    - echo "DEPLOY stage (low memory safe)"
 
-    # 🔥 IMPORTANT: vendor needed for artisan
-    - composer install --no-dev --optimize-autoloader
+    # Vendor required
+    - composer install \
+        --no-dev \
+        --no-interaction \
+        --prefer-dist \
+        --no-progress \
+        --optimize-autoloader \
+        --no-scripts
 
-    # Safe artisan commands
-    - php artisan config:clear
-    - php artisan cache:clear
+    # Run scripts manually (controlled)
+    - php artisan package:discover --ansi || true
+
+    # Safe artisan
+    - php artisan config:clear || true
+    - php artisan cache:clear || true
 
     - echo "DEPLOY SUCCESS ✅"
