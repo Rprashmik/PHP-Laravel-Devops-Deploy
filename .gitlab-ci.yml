@@ -5,9 +5,7 @@ stages:
 build:
   stage: build
   script:
-    - echo "BUILD running on:"
-    - hostname
-    - whoami
+    - echo "BUILD stage"
     - php -v
     - composer --version
     - composer install --no-dev --optimize-autoloader
@@ -15,11 +13,15 @@ build:
 deploy:
   stage: deploy
   script:
-    - echo "DEPLOY running on:"
-    - hostname
+    - echo "DEPLOY stage"
     - pwd
+    - ls -l
+
+    # 🔥 IMPORTANT: vendor needed for artisan
+    - composer install --no-dev --optimize-autoloader
+
+    # Safe artisan commands
     - php artisan config:clear
     - php artisan cache:clear
-    - php artisan route:cache
-    - php artisan view:cache
+
     - echo "DEPLOY SUCCESS ✅"
