@@ -12,35 +12,14 @@ build:
     - echo "BUILD stage (low memory safe)"
     - php -v
     - composer --version
-
-    # Low memory composer
-    - composer install \
-        --no-dev \
-        --no-interaction \
-        --prefer-dist \
-        --no-progress \
-        --optimize-autoloader \
-        --no-scripts
+    - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
 
 deploy:
   stage: deploy
   script:
-    - echo "DEPLOY stage (low memory safe)"
-
-    # Vendor required
-    - composer install \
-        --no-dev \
-        --no-interaction \
-        --prefer-dist \
-        --no-progress \
-        --optimize-autoloader \
-        --no-scripts
-
-    # Run scripts manually (controlled)
+    - echo "DEPLOY stage"
+    - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
     - php artisan package:discover --ansi || true
-
-    # Safe artisan
     - php artisan config:clear || true
     - php artisan cache:clear || true
-
     - echo "DEPLOY SUCCESS ✅"
