@@ -25,7 +25,7 @@ deploy:
   script:
     - echo "DEPLOY stage"
     # Copy code to deploy path
-    - sudo rsync -av --delete ./ $DEPLOY_PATH/
+    - rsync -av --delete ./ $DEPLOY_PATH/
     - cd $DEPLOY_PATH
     # Install vendor (if artifacts not used)
     - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
@@ -35,8 +35,8 @@ deploy:
     - php artisan cache:clear || true
     - php artisan route:clear || true
     # Set permissions
-    - sudo chown -R www-data:www-data $DEPLOY_PATH
-    - sudo chmod -R 775 $DEPLOY_PATH/storage $DEPLOY_PATH/bootstrap/cache
+    - chown -R www-data:www-data $DEPLOY_PATH
+    - chmod -R 775 $DEPLOY_PATH/storage $DEPLOY_PATH/bootstrap/cache
     # Restart Apache (to pick changes)
     - sudo systemctl reload apache2
     - echo "DEPLOY SUCCESS ✅"
