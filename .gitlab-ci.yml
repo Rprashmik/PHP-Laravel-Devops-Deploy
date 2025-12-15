@@ -5,21 +5,38 @@ stages:
 variables:
   COMPOSER_ALLOW_SUPERUSER: "1"
   COMPOSER_MEMORY_LIMIT: "-1"
+  DEPLOY_PATH: "/home/rashmik.parmar/www/PracticalApp"
 
 build:
   stage: build
   script:
-    - echo "BUILD stage (low memory safe)"
+    - echo "BUILD stage"
     - php -v
     - composer --version
     - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
+  artifacts:
+    paths:
+      - vendor/
+      - composer.lock
+    expire_in: 1 hour
 
 deploy:
   stage: deploy
   script:
     - echo "DEPLOY stage"
+    # Copy code to deploy path
+    - rsync -av --delete ./ $DEPLOY_PATH/
+    - cd $DEPLOY_PATH
+    # Install vendor (if artifacts not used)
     - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
-    - php artisan package:discover --ansi || true
+    # Laravel optimization
+    - php artisan key:generate || true
     - php artisan config:clear || true
     - php artisan cache:clear || true
+    - php artisan route:clear || true
+    # Set permissions
+    - sudo chown -R www-data:www-data $DEPLOY_PATH
+    - sudo chmod -R 775 $DEPLOY_PATH/storage $DEPLOY_PATH/bootstrap/cache
+    # Restart Apache (to pick changes)
+    - sudo systemctl reload apache2
     - echo "DEPLOY SUCCESS ✅"
