@@ -2,19 +2,25 @@ stages:
   - build
   - deploy
 
+default:
+  tags:
+    - PHP
+    - PHP-laravel
+
 build:
   stage: build
   script:
+    - echo "Build stage running on self-hosted runner"
+    - php -v
+    - composer --version
     - composer install --no-dev --optimize-autoloader
-  artifacts:
-    paths:
-      - vendor/
 
 deploy:
   stage: deploy
   script:
+    - echo "Deploy stage running on self-hosted runner"
     - php artisan config:clear
     - php artisan cache:clear
     - php artisan route:cache
     - php artisan view:cache
-    - echo "Laravel deployed via Apache/Nginx"
+    - echo "Deploy completed ✅"
