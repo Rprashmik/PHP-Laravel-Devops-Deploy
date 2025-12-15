@@ -25,7 +25,7 @@ deploy:
   script:
     - echo "DEPLOY stage"
     # Copy code to deploy path
-    - rsync -av --delete ./ $DEPLOY_PATH/
+    - sudo rsync -av --delete ./ $DEPLOY_PATH/
     - cd $DEPLOY_PATH
     # Install vendor (if artifacts not used)
     - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
