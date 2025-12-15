@@ -4,27 +4,22 @@ stages:
 
 build:
   stage: build
-  tags:
-    - PHP
-    - PHP-laravel
   script:
-    - echo "BUILD on self-hosted runner"
-    - whoami
+    - echo "BUILD running on:"
     - hostname
+    - whoami
     - php -v
     - composer --version
     - composer install --no-dev --optimize-autoloader
 
 deploy:
   stage: deploy
-  tags:
-    - PHP
-    - PHP-laravel
   script:
-    - echo "DEPLOY on self-hosted runner"
+    - echo "DEPLOY running on:"
+    - hostname
     - pwd
     - php artisan config:clear
     - php artisan cache:clear
     - php artisan route:cache
     - php artisan view:cache
-    - echo "Deploy done ✅"
+    - echo "DEPLOY SUCCESS ✅"
