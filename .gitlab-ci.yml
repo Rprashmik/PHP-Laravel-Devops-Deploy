@@ -10,7 +10,7 @@ default:
 build:
   stage: build
   script:
-    - echo "Build stage running on self-hosted runner"
+    - echo "Running BUILD on self-hosted shell runner"
     - php -v
     - composer --version
     - composer install --no-dev --optimize-autoloader
@@ -18,9 +18,9 @@ build:
 deploy:
   stage: deploy
   script:
-    - echo "Deploy stage running on self-hosted runner"
+    - echo "Running DEPLOY on self-hosted shell runner"
     - php artisan config:clear
     - php artisan cache:clear
     - php artisan route:cache
     - php artisan view:cache
-    - echo "Deploy completed ✅"
+    - echo "Laravel deployed successfully ✅"
