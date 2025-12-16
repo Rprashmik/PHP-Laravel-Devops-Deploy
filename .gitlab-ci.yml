@@ -24,24 +24,19 @@ build:
 deploy:
   stage: deploy
   script:
-    - echo "===== DEPLOY STAGE ====="
-
-    - rsync -av --delete --exclude='.git' --exclude='.gitignore' --exclude='storage/' --exclude='bootstrap/cache/' --exclude='vendor/' ./ "$DEPLOY_PATH"/
+    - rsync -av --delete \
+      --exclude='.git' \
+      --exclude='storage/' \
+      --exclude='bootstrap/cache/' \
+      ./ "$DEPLOY_PATH"/
 
     - cd "$DEPLOY_PATH"
 
-    - composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+    - composer install --no-dev --no-interaction --optimize-autoloader
 
     - php artisan optimize:clear
-    - php artisan config:clear
     - php artisan config:cache
 
-    - chmod -R 775 storage bootstrap/cache || true
-
-
-    # Permissions fix (runner must have rights on these folders)
+    - chown -R www-data:www-data storage bootstrap/cache
     - chmod -R 775 storage bootstrap/cache
-    - chown -R www-data:www-data storage bootstrap/cache || true
 
-    # Apache reload
-    - sudo systemctl reload apache2 || true
