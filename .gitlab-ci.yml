@@ -23,15 +23,10 @@ deploy:
   stage: deploy
   script:
     - echo "===== DEPLOY STAGE ====="
-
-    # Rsync code (keep storage & cache)
-    - rsync -av --delete \
-        --exclude='.git' \
-        --exclude='.gitignore' \
-        --exclude='storage/' \
-        --exclude='bootstrap/cache/' \
-        ./ "$DEPLOY_PATH"
-
+    
+    # Rsync code (single line)
+    - rsync -av --delete --exclude='.git' --exclude='.gitignore' --exclude='storage/' --exclude='bootstrap/cache/' ./ "$DEPLOY_PATH"/
+    
     - cd "$DEPLOY_PATH"
 
     # Laravel commands
@@ -39,7 +34,7 @@ deploy:
     - php artisan config:clear
     - php artisan config:cache
 
-    # Permissions (runtime)
+    # Permissions
     - sudo chown -R www-data:www-data storage bootstrap/cache
     - sudo chmod -R 775 storage bootstrap/cache
 
