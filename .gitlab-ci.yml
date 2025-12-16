@@ -30,7 +30,7 @@ deploy:
         --exclude='.gitignore' \
         --exclude='storage/' \
         --exclude='bootstrap/cache/' \
-        ./ "$DEPLOY_PATH"/
+        ./ "$DEPLOY_PATH"
 
     - cd "$DEPLOY_PATH"
 
