@@ -10,43 +10,24 @@ variables:
 build:
   stage: build
   script:
-    - echo "BUILD stage"
+    - echo "===== BUILD STAGE ====="
     - php -v
     - composer --version
-    - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
+    - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader
   artifacts:
     paths:
       - vendor/
       - composer.lock
     expire_in: 1 hour
 
-#deploy:
-#  stage: deploy
-#  script:
-#    - echo "DEPLOY stage"
-#    - rsync -av --delete --no-owner --no-group --no-perms --omit-dir-times --exclude='.git' --exclude='.gitignore' --exclude='vendor/' --exclude='tests/' --exclude='storage/' --exclude='bootstrap/cache/' ./ "$DEPLOY_PATH"/
-#    - cd "$DEPLOY_PATH"
-#    - git config --global --add safe.directory "$DEPLOY_PATH"
-#    - composer install --no-dev --no-interaction --prefer-dist --no-progress
-#   - php artisan config:clear
-#    - php artisan config:cache
-#    - sudo systemctl reload apache2
-
-# script:
-#  - php artisan optimize:clear
-#  - php artisan view:clear
-#  - php artisan config:clear
-#  - chmod -R 775 storage bootstrap/cache
-#  - sudo chown -R rashmik.parmar:rashmik.parmar storage bootstrap/cache
-#  - chmod -R 775 storage bootstrap/cache
-
 deploy:
   stage: deploy
   script:
-    - echo "DEPLOY stage"
+    - echo "===== DEPLOY STAGE ====="
 
-    # Sync code (keep storage & cache untouched)
-    - rsync -av --delete \
+    # Sync code (storage & cache preserved)
+    - |
+      rsync -av --delete \
         --no-owner --no-group --no-perms --omit-dir-times \
         --exclude='.git' \
         --exclude='.gitignore' \
@@ -58,19 +39,18 @@ deploy:
 
     - cd "$DEPLOY_PATH"
 
-    # Composer
+    # Composer (server side)
     - composer install --no-dev --no-interaction --prefer-dist --no-progress
 
-    # Laravel cache clear
+    # Laravel cleanup
     - php artisan optimize:clear
     - php artisan view:clear
     - php artisan config:clear
     - php artisan config:cache
 
-    # 🔥 IMPORTANT: permissions
+    # Permissions (CRITICAL)
     - sudo chown -R www-data:www-data storage bootstrap/cache
     - sudo chmod -R 775 storage bootstrap/cache
 
     # Reload Apache
     - sudo systemctl reload apache2
-
