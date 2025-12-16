@@ -25,10 +25,18 @@ deploy:
   script:
     - echo "DEPLOY stage"
     - rsync -av --delete --no-owner --no-group --no-perms --omit-dir-times --exclude='.git' --exclude='.gitignore' --exclude='vendor/' --exclude='tests/' --exclude='storage/' ./ "$DEPLOY_PATH"/
+
     - cd "$DEPLOY_PATH"
+
+    # Fix git ownership issue
+    - git config --global --add safe.directory "$DEPLOY_PATH"
+
     - composer install --no-dev --no-interaction --prefer-dist --no-progress
+
     - php artisan config:clear
+    - php artisan config:cache
     - php artisan cache:clear
+
     - chown -R www-data:www-data "$DEPLOY_PATH"
     - chmod -R 775 storage bootstrap/cache
     - systemctl reload apache2
