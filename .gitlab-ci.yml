@@ -24,7 +24,7 @@ deploy:
   stage: deploy
   script:
     - echo "DEPLOY stage"
-    - rsync -av --delete --exclude='.git' --exclude='.gitignore' --exclude='vendor/' --exclude='tests/' --exclude='storage/' ./ "$DEPLOY_PATH"/
+    - rsync -av --delete --no-owner --no-group --no-perms --omit-dir-times --exclude='.git' --exclude='.gitignore' --exclude='vendor/' --exclude='tests/' --exclude='storage/' ./ "$DEPLOY_PATH"/
     - cd "$DEPLOY_PATH"
     - composer install --no-dev --no-interaction --prefer-dist --no-progress
     - php artisan config:clear
