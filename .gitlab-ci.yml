@@ -24,9 +24,14 @@ deploy:
   stage: deploy
   script:
     - echo "DEPLOY stage"
-    - rsync -av --exclude 'vendor/' --delete ./ $DEPLOY_PATH/
+    - rsync -av --delete \
+      --exclude='.git' \
+      --exclude='.gitignore' \
+      --exclude='vendor/' \
+      --exclude='tests/' \
+      ./ $DEPLOY_PATH/
     - cd $DEPLOY_PATH
-    - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-scripts
+    - composer install --no-dev --no-interaction --prefer-dist --no-progress
     - php artisan config:clear
     - php artisan cache:clear
     - chown -R www-data:www-data $DEPLOY_PATH
