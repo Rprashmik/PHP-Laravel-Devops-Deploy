@@ -30,5 +30,5 @@ deploy:
     - composer install --no-dev --no-interaction --prefer-dist --no-progress
     - php artisan config:clear
     - php artisan config:cache
-    - systemctl reload apache2
+    - sudo systemctl reload apache2
 
