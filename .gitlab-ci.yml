@@ -24,19 +24,25 @@ build:
 deploy:
   stage: deploy
   script:
-    - rsync -av --delete \
-      --exclude='.git' \
-      --exclude='storage/' \
-      --exclude='bootstrap/cache/' \
-      ./ "$DEPLOY_PATH"/
+    - echo "===== DEPLOY STAGE ====="
+
+    - |
+      rsync -av --delete \
+        --exclude='.git' \
+        --exclude='storage/' \
+        --exclude='bootstrap/cache/' \
+        ./ "$DEPLOY_PATH"/
 
     - cd "$DEPLOY_PATH"
 
     - composer install --no-dev --no-interaction --optimize-autoloader
 
     - php artisan optimize:clear
+    - php artisan config:clear
     - php artisan config:cache
 
     - chown -R www-data:www-data storage bootstrap/cache
     - chmod -R 775 storage bootstrap/cache
+
+    - systemctl reload apache2
 
