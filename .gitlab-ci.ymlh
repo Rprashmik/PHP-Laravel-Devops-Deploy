@@ -31,12 +31,13 @@ deploy:
     - php artisan config:clear
     - php artisan config:cache
     - sudo systemctl reload apache2
-
  script:
   - php artisan optimize:clear
   - php artisan view:clear
   - php artisan config:clear
   - chmod -R 775 storage bootstrap/cache
-  - sudo chown -R rashmik.parmar:rashmik.parmar storage bootstrap/cache
-  - chmod -R 775 storage bootstrap/cache
+
+  sudo chown -R rashmik.parmar:rashmik.parmar storage bootstrap/cache
+  chmod -R 775 storage bootstrap/cache
+
 
