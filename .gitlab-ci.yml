@@ -33,9 +33,9 @@ deploy:
 
     - composer install --no-dev --no-interaction --prefer-dist --no-progress
 
-    - php artisan config:clear
-    - php artisan config:cache
-    - php artisan cache:clear
+#    - php artisan config:clear
+#    - php artisan config:cache
+#    - php artisan cache:clear
 
     - chown -R www-data:www-data "$DEPLOY_PATH"
     - chmod -R 775 storage bootstrap/cache
