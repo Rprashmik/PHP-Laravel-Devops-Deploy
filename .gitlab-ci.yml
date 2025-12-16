@@ -35,6 +35,11 @@ deploy:
         --exclude='tests/' \
         --exclude='storage/' \
         --exclude='bootstrap/cache/' \
+       --exclude='.env' \
+       --exclude='.env.example' \
+       --exclude='.gitlab-ci.yml' \
+       --exclude='.gitlab-ci.yml*' \
+
         ./ "$DEPLOY_PATH"/
 
     - cd "$DEPLOY_PATH"
