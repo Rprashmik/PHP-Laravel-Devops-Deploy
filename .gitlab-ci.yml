@@ -25,35 +25,33 @@ deploy:
   script:
     - echo "===== DEPLOY STAGE ====="
 
-    # Sync code (storage & cache preserved)
+    # Rsync application code (storage & cache excluded)
     - |
       rsync -av --delete \
         --no-owner --no-group --no-perms --omit-dir-times \
         --exclude='.git' \
         --exclude='.gitignore' \
+        --exclude='.env' \
+        --exclude='.env.example' \
+        --exclude='.gitlab-ci.yml*' \
         --exclude='vendor/' \
         --exclude='tests/' \
         --exclude='storage/' \
         --exclude='bootstrap/cache/' \
-       --exclude='.env' \
-       --exclude='.env.example' \
-       --exclude='.gitlab-ci.yml' \
-       --exclude='.gitlab-ci.yml*' \
-
         ./ "$DEPLOY_PATH"/
 
     - cd "$DEPLOY_PATH"
 
-    # Composer (server side)
+    # Composer on server
     - composer install --no-dev --no-interaction --prefer-dist --no-progress
 
-    # Laravel cleanup
+    # Laravel cache reset
     - php artisan optimize:clear
     - php artisan view:clear
     - php artisan config:clear
     - php artisan config:cache
 
-    # Permissions (CRITICAL)
+    # Permissions for Apache
     - sudo chown -R www-data:www-data storage bootstrap/cache
     - sudo chmod -R 775 storage bootstrap/cache
 
