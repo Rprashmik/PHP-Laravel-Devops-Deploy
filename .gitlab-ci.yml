@@ -24,24 +24,12 @@ deploy:
   stage: deploy
   script:
     - echo "DEPLOY stage"
-
-    - rsync -av --delete --no-owner --no-group --no-perms --omit-dir-times \
-      --exclude='.git' \
-      --exclude='.gitignore' \
-      --exclude='vendor/' \
-      --exclude='tests/' \
-      --exclude='storage/' \
-      --exclude='bootstrap/cache/' \
-      ./ "$DEPLOY_PATH"/
-
+    - rsync -av --delete --no-owner --no-group --no-perms --omit-dir-times --exclude='.git' --exclude='.gitignore' --exclude='vendor/' --exclude='tests/' --exclude='storage/' --exclude='bootstrap/cache/' ./ "$DEPLOY_PATH"/
     - cd "$DEPLOY_PATH"
     - git config --global --add safe.directory "$DEPLOY_PATH"
-
     - composer install --no-dev --no-interaction --prefer-dist --no-progress
-
     - php artisan config:clear
     - php artisan config:cache
-
     - chmod -R 775 storage bootstrap/cache
     - systemctl reload apache2
 
