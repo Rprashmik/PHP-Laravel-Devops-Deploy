@@ -24,16 +24,16 @@ deploy:
   script:
     - echo "===== DEPLOY STAGE ====="
     
-    # Rsync code (exclude vendor, storage, cache)
-    - rsync -av --delete \
-      --exclude='.git' \
-      --exclude='.gitignore' \
-      --exclude='storage/' \
-      --exclude='bootstrap/cache/' \
-      --exclude='vendor/' \
-      ./ "$DEPLOY_PATH"/
+#    # Rsync code (exclude vendor, storage, cache)
+#    - rsync -av --delete \
+#      --exclude='.git' \
+#      --exclude='.gitignore' \
+#      --exclude='storage/' \
+#      --exclude='bootstrap/cache/' \
+#      --exclude='vendor/' \
+#      ./ "$DEPLOY_PATH"/
  
-    - cd "$DEPLOY_PATH"
+#    - cd "$DEPLOY_PATH"
 
     # Composer install on server
     - composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
