@@ -44,8 +44,8 @@ deploy:
     - php artisan config:cache
 
     # Permissions
-    - sudo chown -R www-data:www-data storage bootstrap/cache
-    - sudo chmod -R 775 storage bootstrap/cache
+    - chown -R www-data:www-data storage bootstrap/cache
+    - chmod -R 775 storage bootstrap/cache
 
     # Apache reload
-    - sudo systemctl reload apache2
+    - systemctl reload apache2
