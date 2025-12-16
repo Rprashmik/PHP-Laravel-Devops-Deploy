@@ -24,16 +24,16 @@ deploy:
   script:
     - echo "===== DEPLOY STAGE ====="
     
-#    # Rsync code (exclude vendor, storage, cache)
-#    - rsync -av --delete \
-#      --exclude='.git' \
-#      --exclude='.gitignore' \
-#      --exclude='storage/' \
-#      --exclude='bootstrap/cache/' \
-#      --exclude='vendor/' \
-#      ./ "$DEPLOY_PATH"/
+    # Rsync code (exclude vendor, storage, cache)
+    - rsync -av --delete \
+      --exclude='.git' \
+      --exclude='.gitignore' \
+      --exclude='storage/' \
+      --exclude='bootstrap/cache/' \
+      --exclude='vendor/' \
+      ./ "$DEPLOY_PATH"/
  
-#    - cd "$DEPLOY_PATH"
+    - cd "$DEPLOY_PATH"
 
     # Composer install on server
     - composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
@@ -43,9 +43,9 @@ deploy:
     - php artisan config:clear
     - php artisan config:cache
 
-    # Permissions
-    - sudo chown -R www-data:www-data storage bootstrap/cache
-    - sudo chmod -R 775 storage bootstrap/cache
+    # Permissions fix (runner must have rights on these folders)
+    - chmod -R 775 storage bootstrap/cache
+    - chown -R www-data:www-data storage bootstrap/cache || true
 
     # Apache reload
-    - sudo systemctl reload apache2
+    - sudo systemctl reload apache2 || true
