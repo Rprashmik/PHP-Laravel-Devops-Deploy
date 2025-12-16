@@ -30,6 +30,6 @@ deploy:
     - composer install --no-dev --no-interaction --prefer-dist --no-progress
     - php artisan config:clear
     - php artisan config:cache
-    - chmod -R 775 storage bootstrap/cache
+    - sudo chmod -R 775 storage bootstrap/cache
     - systemctl reload apache2
 
