@@ -12,12 +12,14 @@ build:
   script:
     - echo "===== BUILD STAGE ====="
     - php -v
+
+    # 🔑 REQUIRED for Laravel (CI)
+    - mkdir -p bootstrap/cache
+    - chmod -R 775 bootstrap/cache
+
+    # Composer
     - composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-  artifacts:
-    paths:
-      - vendor/
-      - composer.lock
-    expire_in: 1 hour
+
 
 deploy:
   stage: deploy
