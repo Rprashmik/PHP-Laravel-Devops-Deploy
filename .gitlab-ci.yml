@@ -12,8 +12,7 @@ build:
   script:
     - echo "===== BUILD STAGE ====="
     - php -v
-    - composer --version
-    - composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader
+    - composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
   artifacts:
     paths:
       - vendor/
@@ -25,35 +24,24 @@ deploy:
   script:
     - echo "===== DEPLOY STAGE ====="
 
-    # Rsync application code (storage & cache excluded)
-    - |
-      rsync -av --delete \
-        --no-owner --no-group --no-perms --omit-dir-times \
+    # Rsync code (keep storage & cache)
+    - rsync -av --delete \
         --exclude='.git' \
         --exclude='.gitignore' \
-        --exclude='.env' \
-        --exclude='.env.example' \
-        --exclude='.gitlab-ci.yml*' \
-        --exclude='vendor/' \
-        --exclude='tests/' \
         --exclude='storage/' \
         --exclude='bootstrap/cache/' \
         ./ "$DEPLOY_PATH"/
 
     - cd "$DEPLOY_PATH"
 
-    # Composer on server
-    - composer install --no-dev --no-interaction --prefer-dist --no-progress
-
-    # Laravel cache reset
+    # Laravel commands
     - php artisan optimize:clear
-    - php artisan view:clear
     - php artisan config:clear
     - php artisan config:cache
 
-    # Permissions for Apache
+    # Permissions (runtime)
     - sudo chown -R www-data:www-data storage bootstrap/cache
     - sudo chmod -R 775 storage bootstrap/cache
 
-    # Reload Apache
+    # Apache reload
     - sudo systemctl reload apache2
