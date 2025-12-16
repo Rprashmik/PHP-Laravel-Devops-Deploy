@@ -24,19 +24,21 @@ deploy:
   script:
     - echo "===== DEPLOY STAGE ====="
     
-    # Rsync code (single line)
-    - rsync -av --delete --exclude='.git' --exclude='.gitignore' --exclude='storage/' --exclude='bootstrap/cache/' ./ "$DEPLOY_PATH"/
-   - rsync -av --delete \
-    --exclude='.git' \
-    --exclude='.gitignore' \
-    --exclude='storage/' \
-    --exclude='bootstrap/cache/' \
-    --exclude='vendor/' \
-    ./ "$DEPLOY_PATH"/
+    # Rsync code (exclude vendor, storage, cache)
+    - rsync -av --delete \
+      --exclude='.git' \
+      --exclude='.gitignore' \
+      --exclude='storage/' \
+      --exclude='bootstrap/cache/' \
+      --exclude='vendor/' \
+      ./ "$DEPLOY_PATH"/
  
     - cd "$DEPLOY_PATH"
 
-    # Laravel commands
+    # Composer install on server
+    - composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+    # Laravel cache clear
     - php artisan optimize:clear
     - php artisan config:clear
     - php artisan config:cache
