@@ -26,21 +26,21 @@ deploy:
   script:
     - echo "===== DEPLOY STAGE ====="
 
-    - |
-      rsync -av --delete \
-        --exclude='.git' \
-        --exclude='storage/' \
-        --exclude='bootstrap/cache/' \
-        ./ "$DEPLOY_PATH"/
+    # Ensure dirs
+    - mkdir -p storage/logs bootstrap/cache
 
-    - cd "$DEPLOY_PATH"
+    # IMPORTANT: gitlab-runner ko ownership do
+    - chown -R gitlab-runner:gitlab-runner storage bootstrap/cache
+    - chmod -R 775 storage bootstrap/cache
 
+    # Now composer/artisan will work
     - composer install --no-dev --no-interaction --optimize-autoloader
-
+    - php artisan package:discover
     - php artisan optimize:clear
     - php artisan config:clear
     - php artisan config:cache
 
+    # After build, Apache ke liye switch
     - chown -R www-data:www-data storage bootstrap/cache
     - chmod -R 775 storage bootstrap/cache
 
