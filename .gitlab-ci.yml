@@ -14,8 +14,8 @@ stages:
   - test
   - deploy
 
-before_script:
-  - docker info
+#before_script:
+#  - docker info
 
 build:
   stage: build
