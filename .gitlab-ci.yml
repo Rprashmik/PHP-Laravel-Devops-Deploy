@@ -27,9 +27,9 @@ build:
 test:
   stage: test
   script:
-    # Cleanup any previous containers and volumes
-    - docker compose down -v --remove-orphans || true
-    - docker system prune -f || true
+    # Cleanup any previous containers and volumes (safe)
+    - docker compose down -v --remove-orphans > /dev/null 2>&1 || true
+    - docker system prune -f > /dev/null 2>&1 || true
 
     # Start containers
     - docker compose up -d --build
@@ -50,9 +50,8 @@ test:
     - docker compose exec -T app php artisan test --stop-on-failure
 
   after_script:
-    # Always clean up
-    - docker compose down -v --remove-orphans || true
-
+    # Always clean up safely
+    - docker compose down -v --remove-orphans > /dev/null 2>&1 || true
 
 
 deploy:
