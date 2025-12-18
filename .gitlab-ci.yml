@@ -62,8 +62,7 @@ test:
 deploy:
   stage: deploy
   script:
-    - cd /home/rashmik.parmar/www/PracticalApp
-    - git pull origin main
+    - cd $CI_PROJECT_DIR
     - docker compose down || true
     - docker compose up -d --build
   only:
