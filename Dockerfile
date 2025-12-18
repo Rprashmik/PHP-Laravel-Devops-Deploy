@@ -18,6 +18,8 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
+RUN chown -R www-data:www-data /var/www
+
 
 USER www-data
 
