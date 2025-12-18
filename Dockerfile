@@ -12,6 +12,8 @@ WORKDIR /var/www
 
 COPY . .
 
+COPY composer.json composer.lock ./
+
 RUN composer install --no-dev --optimize-autoloader
 
 RUN chown -R www-data:www-data storage bootstrap/cache \

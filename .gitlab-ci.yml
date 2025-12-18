@@ -24,34 +24,30 @@ build:
   rules:
     - if: $CI_COMMIT_BRANCH
 
-test:
-  stage: test
-  script:
-    # Cleanup any previous containers and volumes (safe)
-    - docker compose down -v --remove-orphans > /dev/null 2>&1 || true
-    - docker system prune -f > /dev/null 2>&1 || true
+script:
+  # Cleanup
+  - docker compose down -v --remove-orphans > /dev/null 2>&1 || true
+  - docker system prune -f > /dev/null 2>&1 || true
 
-    # Start containers
-    - docker compose up -d --build
+  # Start containers
+  - docker compose up -d --build
 
-    # Wait until the database container is ready
-    - echo "Waiting for database to be ready..."
-    - |
-      for i in {1..20}; do
-        docker compose exec -T app php artisan migrate:status > /dev/null 2>&1 && break
-        echo "Database not ready yet, retrying..."
-        sleep 3
-      done
+  # Install dependencies inside app container
+  - docker compose exec -T app composer install --no-interaction --optimize-autoloader
 
-    # Run migrations
-    - docker compose exec -T app php artisan migrate --force
+  # Wait for database
+  - |
+    for i in {1..20}; do
+      docker compose exec -T app php artisan migrate:status > /dev/null 2>&1 && break
+      echo "Database not ready yet, retrying..."
+      sleep 3
+    done
 
-    # Run tests (job fails if tests fail)
-    - docker compose exec -T app php artisan test --stop-on-failure
+  # Run migrations
+  - docker compose exec -T app php artisan migrate --force
 
-  after_script:
-    # Always clean up safely
-    - docker compose down -v --remove-orphans > /dev/null 2>&1 || true
+  # Run tests
+  - docker compose exec -T app php artisan test --stop-on-failure
 
 
 deploy:
