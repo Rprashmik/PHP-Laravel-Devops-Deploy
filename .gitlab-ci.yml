@@ -26,7 +26,7 @@ build:
 
 test:
   stage: test
-script:
+  script:
   # Cleanup
   - docker compose down -v --remove-orphans > /dev/null 2>&1 || true
   - docker system prune -f > /dev/null 2>&1 || true
