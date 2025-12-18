@@ -27,14 +27,32 @@ build:
 test:
   stage: test
   script:
+    # Cleanup any previous containers and volumes
     - docker compose down -v --remove-orphans || true
     - docker system prune -f || true
+
+    # Start containers
     - docker compose up -d --build
-    - sleep 10
+
+    # Wait until the database container is ready
+    - echo "Waiting for database to be ready..."
+    - |
+      for i in {1..20}; do
+        docker compose exec -T app php artisan migrate:status > /dev/null 2>&1 && break
+        echo "Database not ready yet, retrying..."
+        sleep 3
+      done
+
+    # Run migrations
     - docker compose exec -T app php artisan migrate --force
-    - docker compose exec -T app php artisan test
+
+    # Run tests (job fails if tests fail)
+    - docker compose exec -T app php artisan test --stop-on-failure
+
   after_script:
+    # Always clean up
     - docker compose down -v --remove-orphans || true
+
 
 
 deploy:
