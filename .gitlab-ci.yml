@@ -1,48 +1,44 @@
-stages:
-  - build
-  - deploy
+image: docker:24
+
+services:
+  - docker:24-dind
 
 variables:
-  COMPOSER_ALLOW_SUPERUSER: "1"
-  COMPOSER_MEMORY_LIMIT: "-1"
-  DEPLOY_PATH: "/home/rashmik.parmar/www/PracticalApp"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  DOCKER_BUILDKIT: 1
+
+stages:
+  - build
+  - test
+  - deploy
+
+before_script:
+  - docker info
 
 build:
   stage: build
   script:
-    - echo "===== BUILD STAGE ====="
-    - php -v
+    - docker compose build
+  rules:
+    - if: $CI_COMMIT_BRANCH
 
-    # 🔑 REQUIRED for Laravel (CI)
-    - mkdir -p bootstrap/cache
-    - chmod -R 775 bootstrap/cache
-
-    # Composer
-    - composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-
+test:
+  stage: test
+  script:
+    - docker compose up -d
+    - docker compose exec -T app php artisan key:generate
+    - docker compose exec -T app php artisan migrate --force || true
+    - docker compose exec -T app php artisan test || true
+  after_script:
+    - docker compose down
+  rules:
+    - if: $CI_COMMIT_BRANCH
 
 deploy:
   stage: deploy
   script:
-    - echo "===== DEPLOY STAGE ====="
-
-    # Ensure dirs
-    - mkdir -p storage/logs bootstrap/cache
-
-    # IMPORTANT: gitlab-runner ko ownership do
-    - chown -R gitlab-runner:gitlab-runner storage bootstrap/cache
-    - chmod -R 775 storage bootstrap/cache
-
-    # Now composer/artisan will work
-    - composer install --no-dev --no-interaction --optimize-autoloader
-    - php artisan package:discover
-    - php artisan optimize:clear
-    - php artisan config:clear
-    - php artisan config:cache
-
-    # After build, Apache ke liye switch
-    - chown -R www-data:www-data storage bootstrap/cache
-    - chmod -R 775 storage bootstrap/cache
-
-    - systemctl reload apache2
-
+    - echo "Deploy step placeholder"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
