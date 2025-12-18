@@ -62,9 +62,9 @@ test:
 deploy:
   stage: deploy
   script:
-    - cd /home/gitlab-runner/www/PracticalApp
+    - cd /home/rashmik.parmar/www/PracticalApp
     - git pull origin main
-    - docker compose down
+    - docker compose down || true
     - docker compose up -d --build
   only:
     - main

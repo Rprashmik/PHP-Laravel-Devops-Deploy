@@ -3,7 +3,7 @@ version: "3.8"
 services:
   app:
     build: .
-    container_name: laravel_app
+ #   container_name: laravel_app
     volumes:
       - .:/var/www
     extra_hosts:
@@ -13,7 +13,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: laravel_nginx
+ #   container_name: laravel_nginx
     ports:
       - "8001:80"
     volumes:
