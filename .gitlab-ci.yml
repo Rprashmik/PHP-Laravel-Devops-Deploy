@@ -62,6 +62,10 @@ test:
 deploy:
   stage: deploy
   script:
-    - echo "Deploy step placeholder"
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - cd /home/gitlab-runner/www/PracticalApp
+    - git pull origin main
+    - docker compose down
+    - docker compose up -d --build
+  only:
+    - main
+
