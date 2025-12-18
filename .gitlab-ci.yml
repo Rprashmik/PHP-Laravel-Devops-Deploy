@@ -27,24 +27,15 @@ build:
 test:
   stage: test
   script:
-    - docker compose down || true
+    - docker compose down -v --remove-orphans || true
+    - docker system prune -f || true
     - docker compose up -d --build
-
-    # wait for container
     - sleep 10
-
-    # APP KEY (only if not present)
-    - docker compose exec -T app php artisan key:generate --force
-
-    # DB
     - docker compose exec -T app php artisan migrate --force
-
-    # Tests
     - docker compose exec -T app php artisan test
   after_script:
-    - docker compose down || true
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - docker compose down -v --remove-orphans || true
+
 
 deploy:
   stage: deploy
