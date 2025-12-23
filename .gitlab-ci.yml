@@ -1,12 +1,42 @@
+image: docker:24
+
+services:
+  - docker:24-dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_BUILDKIT: 1
+
+default:
+  tags:
+    - php-laravel
+
 stages:
+  - build
+  - test
   - deploy
+
+build:
+  stage: build
+  script:
+    - docker compose build
+
+test:
+  stage: test
+  script:
+    - docker compose up -d
+    - docker compose exec -T app php artisan migrate --force
+    - docker compose exec -T app php artisan test
+  after_script:
+    - docker compose down -v || true
 
 deploy:
   stage: deploy
   only:
     - main
   script:
-    - docker compose down || true
-    - docker compose up -d --build
-    - docker compose exec app php artisan migrate --force
-    - docker compose exec app php artisan optimize
+    - docker compose -f docker-compose.prod.yml down || true
+    - docker compose -f docker-compose.prod.yml up -d --build
+    - docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
+    - docker compose -f docker-compose.prod.yml exec -T app php artisan optimize
