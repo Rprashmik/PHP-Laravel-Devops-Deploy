@@ -1,56 +1,14 @@
-image: docker:24
-
-services:
-  - docker:24-dind
-
-variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-  COMPOSE_DOCKER_CLI_BUILD: 1
-  DOCKER_BUILDKIT: 1
-
 stages:
-  - build
-  - test
   - deploy
 
-# ---------------- BUILD ----------------
-build:
-  stage: build
-  rules:
-    - if: '$CI_COMMIT_BRANCH'
-  script:
-    - docker compose build
-
-# ---------------- TEST ----------------
-test:
-  stage: test
-  script:
-    - docker compose up -d
-
-    # wait for DB (important)
-    - |
-      for i in {1..20}; do
-        docker compose exec -T app php artisan migrate:status >/dev/null 2>&1 && break
-        echo "Waiting for database..."
-        sleep 3
-      done
-
-    - docker compose exec -T app php artisan migrate --force
-    - docker compose exec -T app php artisan test --stop-on-failure
-
-  after_script:
-    - |
-      docker compose down -v --remove-orphans || true
-      exit 0
-
-# ---------------- DEPLOY ----------------
 deploy:
   stage: deploy
+  tags:
+    - php-laravel
   only:
     - main
   script:
-    - docker compose -f docker-compose.prod.yml down || true
-    - docker compose -f docker-compose.prod.yml up -d --build
-    - docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
-    - docker compose -f docker-compose.prod.yml exec -T app php artisan optimize
+    - docker compose down || true
+    - docker compose up -d --build
+    - docker compose exec app php artisan migrate --force
+    - docker compose exec app php artisan optimize
