@@ -3,8 +3,6 @@ stages:
 
 deploy:
   stage: deploy
-  tags:
-    - php-laravel
   only:
     - main
   script:
