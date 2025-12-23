@@ -17,24 +17,32 @@ stages:
 # ---------------- BUILD ----------------
 build:
   stage: build
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
   script:
     - docker compose build
-  rules:
-    - if: $CI_COMMIT_BRANCH
 
 # ---------------- TEST ----------------
 test:
   stage: test
   script:
-    - docker compose up -d --build
+    - docker compose up -d
+
+    # wait for DB (important)
+    - |
+      for i in {1..20}; do
+        docker compose exec -T app php artisan migrate:status >/dev/null 2>&1 && break
+        echo "Waiting for database..."
+        sleep 3
+      done
+
     - docker compose exec -T app php artisan migrate --force
     - docker compose exec -T app php artisan test --stop-on-failure
+
   after_script:
     - |
       docker compose down -v --remove-orphans || true
       exit 0
-
-
 
 # ---------------- DEPLOY ----------------
 deploy:
@@ -45,4 +53,4 @@ deploy:
     - docker compose -f docker-compose.prod.yml down || true
     - docker compose -f docker-compose.prod.yml up -d --build
     - docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
-    - docker compose -f docker-compose.prod.yml exec -T app php artisan config:clear
+    - docker compose -f docker-compose.prod.yml exec -T app php artisan optimize
