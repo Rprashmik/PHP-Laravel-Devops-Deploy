@@ -6,7 +6,6 @@ services:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  DOCKER_BUILDKIT: 1
 
 default:
   tags:
@@ -16,27 +15,14 @@ stages:
   - build
   - deploy
 
-# --------------------
-# BUILD STAGE (optional but safe)
-# --------------------
 build:
   stage: build
   script:
     - docker compose build
 
-# --------------------
-# DEPLOY STAGE
-# --------------------
 deploy:
   stage: deploy
   only:
     - main
   script:
-    # Start app + mysql for CI
-    - docker compose -f docker-compose.yml -f docker-compose.up -d
-
-    # WAIT for MySQL (CRITICAL)
-    - |
-      echo "Waiting for MySQL..."
-      until docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T mysql \
-        mysqladmin ping -h "localhost" -
+    - docker compose up -d --build
