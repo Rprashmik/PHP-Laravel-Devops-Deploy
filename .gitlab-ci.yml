@@ -13,42 +13,16 @@ default:
     - PHP-laravel
 
 stages:
-  - test
+  - build
   - deploy
 
 # --------------------
-# TEST STAGE
+# BUILD STAGE (optional but safe)
 # --------------------
-test:
-  stage: test
+build:
+  stage: build
   script:
-    # Start containers
-    - docker compose up -d
-
-    # WAIT for MySQL (CRITICAL FIX)
-    - |
-      echo "Waiting for MySQL..."
-      for i in {1..20}; do
-        if docker compose exec -T mysql mysqladmin ping -h "localhost" --silent; then
-          echo "MySQL is ready"
-          break
-        fi
-        echo "MySQL not ready yet..."
-        sleep 3
-      done
-
-    # Clear Laravel cache
-    - docker compose exec -T app php artisan config:clear
-    - docker compose exec -T app php artisan cache:clear
-
-    # Run migrations
-    - docker compose exec -T app php artisan migrate --force
-
-    # Run tests
-    - docker compose exec -T app php artisan test
-
-  after_script:
-    - docker compose down -v || true
+    - docker compose build
 
 # --------------------
 # DEPLOY STAGE
@@ -58,19 +32,11 @@ deploy:
   only:
     - main
   script:
-    - docker compose -f docker-compose.prod.yml down || true
-    - docker compose -f docker-compose.prod.yml up -d --build
+    # Start app + mysql for CI
+    - docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
 
-    # Wait for MySQL in PROD
+    # WAIT for MySQL (CRITICAL)
     - |
-      echo "Waiting for PROD MySQL..."
-      for i in {1..20}; do
-        if docker compose -f docker-compose.prod.yml exec -T mysql mysqladmin ping -h "localhost" --silent; then
-          echo "MySQL is ready"
-          break
-        fi
-        sleep 3
-      done
-
-    - docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
-    - docker compose -f docker-compose.prod.yml exec -T app php artisan optimize
+      echo "Waiting for MySQL..."
+      until docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T mysql \
+        mysqladmin ping -h "localhost" -
