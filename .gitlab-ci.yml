@@ -10,7 +10,7 @@ variables:
 
 default:
   tags:
-    - php-laravel
+    - PHP-laravel
 
 stages:
   - build
