@@ -1,30 +1,44 @@
-# PHP Laravel DevOps Deployment 🚀
+🚀 PHP Laravel DevOps Deployment (AWS + Docker + GitLab CI/CD)
 
-This project demonstrates a complete **DevOps-oriented deployment** of a
-Laravel application using **Docker, Nginx, and GitLab CI/CD**.
+This project demonstrates a production-style DevOps deployment of a Laravel application on AWS EC2 (Amazon Linux) using Docker, Nginx, and a Self-Hosted GitLab Runner.
+The entire pipeline automates build, test, and deployment with zero manual server login.
 
 ## 🔧 Tech Stack
-- PHP (Laravel)
+- PHP (Laravel Framework)
+- Amazon Linux EC2 (Free Tier)
 - Docker & Docker Compose
-- Nginx
-- GitLab CI/CD (Self-hosted Runner)
-- Linux (Ubuntu)
+- Nginx Reverse Proxy
+- GitLab CI/CD (Self-Hosted Runner on EC2)
+- Amazon S3 (optional for assets/storage)
+- Cloudflare DNS (optional for domain + SSL)
 
 ## 📦 Architecture
-- Laravel runs inside a PHP-FPM container
-- Nginx acts as a reverse proxy
+
+**Developer → Push Code → GitLab → CI/CD Pipeline → EC2 → Docker Containers → Nginx → Live App**
+
+- Laravel runs inside PHP-FPM container
+- Nginx routes incoming traffic to Laravel container
 - Docker Compose manages multi-container setup
-- GitLab CI pipeline automates build & deployment
+- GitLab Runner installed on EC2 automates deployment
+- Pipeline deploys without manual SSH login
 
-## 🔁 CI/CD Flow
-1. Code pushed to `main` branch
-2. GitLab CI pipeline triggers automatically
-3. Docker image is built
-4. Containers are deployed using Docker Compose
-5. Laravel migrations run automatically
+🔁 CI/CD Flow
 
-## 🌐 Live Access (Local Network)
+- Developer pushes code to main branch
+- GitLab CI/CD pipeline automatically triggers
+- Docker image is built on Amazon Linux
+- Old containers stop → new ones deploy
+- Database migrations (if configured) run automatically
+- Application update goes live instantly
 
+📦 Infrastructure Overview
+Component	    Technology
+Compute         AWS EC2 (Amazon Linux)
+Web Server	    Docker + Nginx
+App Runtime 	Laravel on PHP-FPM
+Automation	    GitLab CI/CD Runner
+Reverse Proxy	Nginx
+SSL (optional)	Let's Encrypt via Cloudflare
 
 ## 📸 CI/CD & Deployment Proof
 
