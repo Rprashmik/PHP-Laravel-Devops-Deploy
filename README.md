@@ -1,4 +1,10 @@
-🚀 PHP Laravel DevOps Deployment (AWS + Docker + GitLab CI/CD)
+<div align="center">
+
+# 🚀 **PHP Laravel DevOps Deployment**
+### *(AWS + Docker + GitLab CI/CD Pipeline)*
+
+</div>
+
 
 This project demonstrates a production-style DevOps deployment of a Laravel application on AWS EC2 (Amazon Linux) using Docker, Nginx, and a Self-Hosted GitLab Runner.
 The entire pipeline automates build, test, and deployment with zero manual server login.
